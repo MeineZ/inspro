@@ -2,23 +2,28 @@
 #include <cstdint>
 
 #include <stb_image_write.h>
+#include <inspro/vec3.hpp>
 
 int main()
 {
-
-
-	const std::uint8_t width = 200;
-	const std::uint8_t height = 100;
+	const std::uint16_t width = 200;
+	const std::uint16_t height = 100;
 
 	std::uint8_t buffer[height][width][3];
 
-	for( int y = height - 1; y >= 0; --y )
+	vec3 color;
+	std::int16_t iHeight = 0;
+
+
+	for( std::uint16_t y = 0; y < height; ++y )
 	{
-		for( int x = 0; x < width; ++x )
+		for( std::uint16_t x = 0; x < width; ++x )
 		{
-			buffer[y][x][0] = std::uint8_t( 255.99 * ( float( x ) / float( width ) ) );
-			buffer[y][x][1] = std::uint8_t( 255.99 * ( float( y ) / float( height ) ) );
-			buffer[y][x][2] = std::uint8_t( 255.99 * 0.2f );
+			color = vec3( float( x ) / float( width ), float( y ) / float( height ), 0.2f );
+			iHeight = (height - y) - 1;
+			buffer[iHeight][x][0] = std::uint8_t( 255.99f * ( float( x ) / float( width ) ) );
+			buffer[iHeight][x][1] = std::uint8_t( 255.99f * ( float( y ) / float( height ) ) );
+			buffer[iHeight][x][2] = std::uint8_t( 255.99f * 0.2f );
 		}
 	}
 
