@@ -8,7 +8,7 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_ROOT_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_ROOT_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_ROOT_DIR}/bin)
 
-set(INSPRO_DIR ${PROJECT_SOURCE_DIR}/inspro)
+set(INSPRO_SOURCE_DIR ${PROJECT_SOURCE_DIR}/inspro)
 set(UTIL_SOURCE_DIR ${PROJECT_SOURCE_DIR}/util)
 
 # === Configuration === #
@@ -55,8 +55,8 @@ set_target_properties(${UTIL_NAME} PROPERTIES CMAKE_CXX_STANDARD_REQUIRED ON)
 
 ######################### INSPRO #############################
 # === Files === #
-file(GLOB INSPRO_HEADERS "${INSPRO_DIR}/*.hpp")
-file(GLOB INSPRO_SOURCES "${INSPRO_DIR}/*.cpp")
+file(GLOB INSPRO_HEADERS "${INSPRO_SOURCE_DIR}/*.hpp")
+file(GLOB INSPRO_SOURCES "${INSPRO_SOURCE_DIR}/*.cpp")
 file(GLOB INSPRO_UTIL_HEADERS "${UTIL_SOURCE_DIR}/*.hpp")
 file(GLOB INSPRO_UTIL_SOURCES "${UTIL_SOURCE_DIR}/*.cpp")
 
@@ -75,8 +75,7 @@ set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MTd")
 set (CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} /MT")
 
 # === Include directories === #
-target_include_directories(${INSPRO_NAME} PUBLIC ${PROJECT_SOURCE_DIR})
-target_include_directories(${INSPRO_NAME} PRIVATE ${UTIL_SOURCE_DIR})
+target_include_directories(${INSPRO_NAME} PUBLIC ${PROJECT_ROOT_DIR}/src)
 target_include_directories(${INSPRO_NAME} PRIVATE ${PROJECT_ROOT_DIR}/deps/stb)
 
 # === Link directories === #
