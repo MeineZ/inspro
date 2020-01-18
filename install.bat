@@ -40,11 +40,11 @@ call :getWindowsSDK
 
 call :colorEcho %aqua% "#### Options ####"
 call :optionCleanBuild
-REM # call :optionUpdateSubmodules
+call :optionUpdateSubmodules
 REM # call :optionDoxygen
 
 call :doCleanBuild
-REM # call :updateSubmodules
+call :updateSubmodules
 REM #call :runDoxygen
 
 call :genVS17Win64

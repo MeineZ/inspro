@@ -45,6 +45,7 @@ set (CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} /MT")
 
 # === Include directories === #
 target_include_directories(${INSPRO_NAME} PUBLIC ${PROJECT_ROOT_DIR}/src)
+target_include_directories(${INSPRO_NAME} PRIVATE ${PROJECT_ROOT_DIR}/deps/stb)
 
 # === Link directories === #
 link_directories(${PROJECT_ROOT_DIR}/lib)
