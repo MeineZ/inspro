@@ -32,8 +32,8 @@ project(${PROJECT_NAME})
 # === Util files === #
 file(GLOB UTIL_HEADERS "${UTIL_SOURCE_DIR}/*.hpp")
 file(GLOB UTIL_SOURCES "${UTIL_SOURCE_DIR}/*.cpp")
-file(GLOB UTIL_STB_HEADERS "${UTIL_SOURCE_DIR}/stb/*.hpp")
-file(GLOB UTIL_STB_SOURCES "${UTIL_SOURCE_DIR}/stb/*.cpp")
+file(GLOB_RECURSE UTIL_STB_HEADERS "${UTIL_SOURCE_DIR}/stb/*.hpp")
+file(GLOB_RECURSE UTIL_STB_SOURCES "${UTIL_SOURCE_DIR}/stb/*.cpp")
 
 # === Util source groups === #
 source_group("Main" FILES ${UTIL_HEADERS} ${UTIL_SOURCES})
@@ -57,12 +57,8 @@ set_target_properties(${UTIL_NAME} PROPERTIES CMAKE_CXX_STANDARD_REQUIRED ON)
 # === Files === #
 file(GLOB INSPRO_HEADERS "${INSPRO_SOURCE_DIR}/*.hpp")
 file(GLOB INSPRO_SOURCES "${INSPRO_SOURCE_DIR}/*.cpp")
-file(GLOB INSPRO_UTIL_HEADERS "${UTIL_SOURCE_DIR}/*.hpp")
-file(GLOB INSPRO_UTIL_SOURCES "${UTIL_SOURCE_DIR}/*.cpp")
-
 # === Source groups === #
 source_group("Main" FILES ${INSPRO_HEADERS} ${INSPRO_SOURCES})
-source_group("Main" FILES ${INSPRO_UTIL_HEADERS} ${INSPRO_UTIL_SOURCES})
 
 # === Create inspro project === #
 add_executable(${INSPRO_NAME} 
