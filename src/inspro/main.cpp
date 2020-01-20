@@ -26,18 +26,21 @@ insp::Vec3 RenderColor( const insp::Ray &r, insp::Hittable *world )
 
 int main()
 {
-	const std::uint16_t width = 200;
-	const std::uint16_t height = 100;
+	const std::uint16_t width = 1920;
+	const std::uint16_t height = 1080;
+	std::uint8_t * buffer = static_cast<std::uint8_t*>(malloc( width * height * 3 * sizeof( std::uint8_t )));
 
-	std::uint8_t buffer[height][width][3];
+	float aspectRatio = static_cast<float>(height) / static_cast<float>(width);
+
+	insp::Vec3 horizontal( 4.0, 0.0, 0.0 );
+	insp::Vec3 vertical( 0.0, aspectRatio * 4.0f, 0.0 );
+	insp::Vec3 lowerLeftCorner( horizontal.x() * -0.5f, vertical.y() * -0.5f, -1.0 );
+
 
 	insp::Ray ray;
 	insp::Vec3 color;
-	std::int16_t iHeight = 0;
+	std::int16_t iY = 0;
 
-	insp::Vec3 lowerLeftCorner( -2.0, -1.0, -1.0 );
-	insp::Vec3 horizontal( 4.0, 0.0, 0.0 );
-	insp::Vec3 vertical( 0.0, 2.0, 0.0 );
 	insp::Vec3 origin( 0.0, 0.0, 0.0 );
 
 	insp::Hittable *list[2];
@@ -56,15 +59,17 @@ int main()
 			insp::Vec3 p = ray.PointAtParameter( 2.0f );
 			color = RenderColor( ray, world );
 
-			iHeight = (height - y) - 1;
-			buffer[iHeight][x][0] = std::uint8_t( 255.99f * color[0] );
-			buffer[iHeight][x][1] = std::uint8_t( 255.99f * color[1] );
-			buffer[iHeight][x][2] = std::uint8_t( 255.99f * color[2] );
+			iY = (height - y) - 1;
+			buffer[(( iY * width ) + x) * 3] = std::uint8_t( 255.99f * color[0] );
+			buffer[( ( iY * width ) + x ) * 3 + 1] = std::uint8_t( 255.99f * color[1] );
+			buffer[( ( iY * width ) + x ) * 3 + 2] = std::uint8_t( 255.99f * color[2] );
 		}
 	}
 
 
 	stbi_write_png( "final.png", width, height, 3, buffer, 0 );
+
+	free( buffer );
 
 	return 0;
 }
