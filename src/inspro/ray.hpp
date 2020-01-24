@@ -1,35 +1,37 @@
 #pragma once
-#include <inspro/Vec3.hpp>
+#include <glm/vec3.hpp>
 
 namespace insp
 {
     class Ray
     {
     public:
-        Ray()
+        Ray() :
+			origin( 0.0f, 0.0f, 0.0f ),
+            direction( 0.0f, 0.0f, -1.0f )
         { }
 
-        Ray( const Vec3 &origin, const Vec3 &direction ):
+        Ray( const glm::vec3 &origin, const glm::vec3 &direction ):
             origin( origin ),
             direction( direction )
         { }
 
-        Vec3 GetOrigin() const
+        glm::vec3 GetOrigin() const
         {
             return origin;
         }
-        Vec3 GetDirection() const
+        glm::vec3 GetDirection() const
         {
             return direction;
         }
-        Vec3 PointAtParameter( float t ) const
+        glm::vec3 PointAtParameter( float t ) const
         {
             return origin + t * direction;
         }
 
     private:
-        Vec3 origin;
-        Vec3 direction;
+        glm::vec3 origin;
+        glm::vec3 direction;
     };
 
 } // insp namespace

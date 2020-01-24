@@ -11,23 +11,23 @@ namespace insp
             center(0.0f, 0.0f, 0.0f),
             radius(0.0f)
         { }
-        Sphere( Vec3 center, float radius ): 
+        Sphere( glm::vec3 center, float radius ):
             center( center ), 
             radius( radius )
         { };
 
         virtual bool Hit( const Ray &r, float tMin, float tMax, HitRecord &rec ) const;
 
-        Vec3 center;
+        glm::vec3 center;
         float radius;
     };
 
     bool Sphere::Hit( const Ray &r, float tMin, float tMax, HitRecord &rec ) const
     {
-        Vec3 oc = r.GetOrigin() - center;
-        float a = dot( r.GetDirection(), r.GetDirection() );
-        float b = dot( oc, r.GetDirection() );
-        float c = dot( oc, oc ) - radius * radius;
+        glm::vec3 oc = r.GetOrigin() - center;
+        float a = glm::dot( r.GetDirection(), r.GetDirection() );
+        float b = glm::dot( oc, r.GetDirection() );
+        float c = glm::dot( oc, oc ) - radius * radius;
         float discriminant = b * b - a * c;
         if( discriminant > 0 )
         {
