@@ -83,6 +83,8 @@ int main()
 	stbi_write_png( "final.png", WIDTH, HEIGHT, 3, buffer, 0 );
 
 	free( buffer );
+	delete [] list;
+	delete world;
 
 	return 0;
 }
