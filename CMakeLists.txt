@@ -10,12 +10,16 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_ROOT_DIR}/bin)
 
 set(INSPRO_SOURCE_DIR ${PROJECT_SOURCE_DIR}/inspro)
 set(UTIL_SOURCE_DIR ${PROJECT_SOURCE_DIR}/util)
+set(GLM_SOURCE_DIR ${PROJECT_ROOT_DIR}/deps/glm/glm)
+
 
 # === Configuration === #
 set(PROJECT_NAME "InsproProject")
 set(INSPRO_EXTENSION ".exe")
 set(INSPRO_NAME "Inspro")
 set(UTIL_NAME "InsproUtil")
+set(GLM_NAME "InsproGLM")
+
 
 # === Display Init Info === #
 message("\n")
@@ -25,8 +29,67 @@ message(STATUS "CMake archive output dir:\t" ${CMAKE_ARCHIVE_OUTPUT_DIRECTORY})
 message(STATUS "CMake library output dir:\t" ${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
 message(STATUS "CMake runtime output dir:\t" ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} "\n\n")
 
+
 # === Create solution === #
 project(${PROJECT_NAME})
+
+
+######################### GLM #############################
+# === GLM Files === #
+file(GLOB GLM_ROOT_SOURCE ${GLM_SOURCE_DIR}/*.cpp)
+file(GLOB GLM_ROOT_INLINE ${GLM_SOURCE_DIR}/*.inl)
+file(GLOB GLM_ROOT_HEADER ${GLM_SOURCE_DIR}/*.hpp)
+file(GLOB_RECURSE GLM_CORE_SOURCE ${GLM_SOURCE_DIR}/detail/*.cpp)
+file(GLOB_RECURSE GLM_CORE_INLINE ${GLM_SOURCE_DIR}/detail/*.inl)
+file(GLOB_RECURSE GLM_CORE_HEADER ${GLM_SOURCE_DIR}/detail/*.hpp)
+file(GLOB_RECURSE GLM_EXT_SOURCE ${GLM_SOURCE_DIR}/ext/*.cpp)
+file(GLOB_RECURSE GLM_EXT_INLINE ${GLM_SOURCE_DIR}/ext/*.inl)
+file(GLOB_RECURSE GLM_EXT_HEADER ${GLM_SOURCE_DIR}/ext/*.hpp)
+file(GLOB_RECURSE GLM_GTC_SOURCE ${GLM_SOURCE_DIR}/gtc/*.cpp)
+file(GLOB_RECURSE GLM_GTC_INLINE ${GLM_SOURCE_DIR}/gtc/*.inl)
+file(GLOB_RECURSE GLM_GTC_HEADER ${GLM_SOURCE_DIR}/gtc/*.hpp)
+file(GLOB_RECURSE GLM_GTX_SOURCE ${GLM_SOURCE_DIR}/gtx/*.cpp)
+file(GLOB_RECURSE GLM_GTX_INLINE ${GLM_SOURCE_DIR}/gtx/*.inl)
+file(GLOB_RECURSE GLM_GTX_HEADER ${GLM_SOURCE_DIR}/gtx/*.hpp)
+file(GLOB_RECURSE GLM_SIMD_SOURCE ${GLM_SOURCE_DIR}/simd/*.cpp)
+file(GLOB_RECURSE GLM_SIMD_INLINE ${GLM_SOURCE_DIR}/simd/*.inl)
+file(GLOB_RECURSE GLM_SIMD_HEADER ${GLM_SOURCE_DIR}/simd/*.h)
+
+# === GLM Source groups === #
+source_group("Core Files" FILES ${GLM_CORE_SOURCE})
+source_group("Core Files" FILES ${GLM_CORE_INLINE})
+source_group("Core Files" FILES ${GLM_CORE_HEADER})
+source_group("EXT Files" FILES ${GLM_EXT_SOURCE})
+source_group("EXT Files" FILES ${GLM_EXT_INLINE})
+source_group("EXT Files" FILES ${GLM_EXT_HEADER})
+source_group("GTC Files" FILES ${GLM_GTC_SOURCE})
+source_group("GTC Files" FILES ${GLM_GTC_INLINE})
+source_group("GTC Files" FILES ${GLM_GTC_HEADER})
+source_group("GTX Files" FILES ${GLM_GTX_SOURCE})
+source_group("GTX Files" FILES ${GLM_GTX_INLINE})
+source_group("GTX Files" FILES ${GLM_GTX_HEADER})
+source_group("SIMD Files" FILES ${GLM_SIMD_SOURCE})
+source_group("SIMD Files" FILES ${GLM_SIMD_INLINE})
+source_group("SIMD Files" FILES ${GLM_SIMD_HEADER})
+
+# === Create GLM library === #
+add_library(${GLM_NAME} STATIC ${GLM_ROOT_TEXT} ${GLM_ROOT_MD} ${GLM_ROOT_NAT}
+	${GLM_ROOT_SOURCE}    ${GLM_ROOT_INLINE}    ${GLM_ROOT_HEADER}
+	${GLM_CORE_SOURCE}    ${GLM_CORE_INLINE}    ${GLM_CORE_HEADER}
+	${GLM_EXT_SOURCE}     ${GLM_EXT_INLINE}     ${GLM_EXT_HEADER}
+	${GLM_GTC_SOURCE}     ${GLM_GTC_INLINE}     ${GLM_GTC_HEADER}
+	${GLM_GTX_SOURCE}     ${GLM_GTX_INLINE}     ${GLM_GTX_HEADER}
+	${GLM_SIMD_SOURCE}    ${GLM_SIMD_INLINE}    ${GLM_SIMD_HEADER})
+
+# === GLM include directories === #
+target_include_directories(${GLM_NAME} PUBLIC ${GLM_SOURCE_DIR}/..)
+target_include_directories(${GLM_NAME} PUBLIC ${GLM_SOURCE_DIR})
+
+# === GLM additional properties === #
+set_target_properties(${GLM_NAME} PROPERTIES CXX_STANDARD 20)
+set_target_properties(${GLM_NAME} PROPERTIES CXX_EXTENSIONS OFF)
+set_target_properties(${GLM_NAME} PROPERTIES CMAKE_CXX_STANDARD_REQUIRED ON)
+
 
 ######################### UTIL #############################
 # === Util files === #
@@ -53,6 +116,7 @@ set_target_properties(${UTIL_NAME} PROPERTIES CXX_STANDARD 20)
 set_target_properties(${UTIL_NAME} PROPERTIES CXX_EXTENSIONS OFF)
 set_target_properties(${UTIL_NAME} PROPERTIES CMAKE_CXX_STANDARD_REQUIRED ON)
 
+
 ######################### INSPRO #############################
 # === Files === #
 file(GLOB INSPRO_HEADERS "${INSPRO_SOURCE_DIR}/*.hpp")
@@ -78,7 +142,8 @@ target_include_directories(${INSPRO_NAME} PRIVATE ${PROJECT_ROOT_DIR}/deps/stb)
 link_directories(${PROJECT_ROOT_DIR}/lib)
 
 # === Link libraries === #
-target_link_libraries(${INSPRO_NAME} ${UTIL_NAME})
+target_link_libraries(${INSPRO_NAME} ${GLM_NAME} ${UTIL_NAME})
+
 
 # === Additional properties === #
 set_target_properties(${INSPRO_NAME} PROPERTIES SUFFIX ${INSPRO_EXTENSION})
