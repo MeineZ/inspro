@@ -154,9 +154,11 @@ set_target_properties(${INSPRO_NAME} PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "$
 if (MSVC)
 	target_compile_options(${INSPRO_NAME} PRIVATE /W4 /permissive- /MP /Gm- /WX)
 	target_compile_options(${UTIL_NAME} PRIVATE /W4 /permissive- /MP /Gm- /WX)
+	target_compile_options(${UTIL_NAME} PRIVATE /W0 /permissive- /MP /Gm- /WX-)
 else()
 	target_compile_options(${INSPRO_NAME} PRIVATE -Wall -Wextra -pedantic -Werror)
 	target_compile_options(${UTIL_NAME} PRIVATE -Wall -Wextra -pedantic -Werror)
+	target_compile_options(${UTIL_NAME} PRIVATE -W0)
 endif()
 
 # === Change the startup project to this project (not the CMake projects) === #

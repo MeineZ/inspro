@@ -6,7 +6,7 @@
 /*!
 	\namespace Inspro namespace.
 */
-namespace ins
+namespace insp
 {
 	/*!
 		\namespace Vector namespace.
