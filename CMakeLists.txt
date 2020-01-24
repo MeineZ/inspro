@@ -90,7 +90,6 @@ set_target_properties(${GLM_NAME} PROPERTIES CXX_STANDARD 20)
 set_target_properties(${GLM_NAME} PROPERTIES CXX_EXTENSIONS OFF)
 set_target_properties(${GLM_NAME} PROPERTIES CMAKE_CXX_STANDARD_REQUIRED ON)
 
-
 ######################### UTIL #############################
 # === Util files === #
 file(GLOB UTIL_HEADERS "${UTIL_SOURCE_DIR}/*.hpp")

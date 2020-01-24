@@ -10,9 +10,6 @@
 #include <inspro/hittable_list.hpp>
 #include <inspro/sphere.hpp>
 
-// #define GLM_FORCE_DEFAULT_ALIGNED_GENTYPES
-// #define GLM_FORCE_SIMD_AVX2
-
 glm::vec3 RenderColor( const insp::Ray &r, insp::Hittable *world )
 {
 	insp::HitRecord rec;
