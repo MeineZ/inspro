@@ -35,16 +35,16 @@ namespace insp
             if( temp < tMax && temp > tMin )
             {
                 rec.t = temp;
-                rec.p = r.PointAtParameter( rec.t );
-                rec.normal = ( rec.p - center ) / radius;
+                rec.position = r.PointAtParameter( rec.t );
+                rec.normal = ( rec.position - center ) / radius;
                 return true;
             }
             temp = ( -b + sqrt( discriminant ) ) / a;
             if( temp < tMax && temp > tMin )
             {
                 rec.t = temp;
-                rec.p = r.PointAtParameter( rec.t );
-                rec.normal = ( rec.p - center ) / radius;
+                rec.position = r.PointAtParameter( rec.t );
+                rec.normal = ( rec.position - center ) / radius;
                 return true;
             }
         }

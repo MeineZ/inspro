@@ -7,7 +7,7 @@ namespace insp
     struct HitRecord
     {
         float t = 0.0f;
-        glm::vec3 p { 0.0f, 0.0f, 0.0f };
+        glm::vec3 position { 0.0f, 0.0f, 0.0f };
         glm::vec3 normal { 0.0f, 0.0f, 0.0f };
     };
 

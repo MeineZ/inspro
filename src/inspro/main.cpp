@@ -16,10 +16,11 @@
 
 glm::vec3 RenderColor( const insp::Ray &r, insp::Hittable *world )
 {
-	insp::HitRecord rec;
-	if( world->Hit( r, 0.0, std::numeric_limits<float>::max(), rec ) )
+	insp::HitRecord hitRecord;
+	if( world->Hit( r, 0.001f, std::numeric_limits<float>::max(), hitRecord ) )
 	{
-		return 0.5f * ( rec.normal + 1.0f );
+		glm::vec3 target = hitRecord.position + hitRecord.normal + insp::RandomInUnitSphere();
+		return 0.5f * RenderColor( insp::Ray( hitRecord.position, target - hitRecord.position ), world );
 	}
 	else
 	{
@@ -31,7 +32,12 @@ glm::vec3 RenderColor( const insp::Ray &r, insp::Hittable *world )
 
 int main()
 {
-	const std::uint8_t MAX_SAMPLES = 50;
+#ifdef _DEBUG
+	std::uint16_t lastProgress = 0;
+	std::uint16_t currentProgress = 0;
+#endif // _DEBUG
+
+	const std::uint8_t MAX_SAMPLES = 2;
 
 	const std::uint16_t WIDTH = 1920;
 	const std::uint16_t HEIGHT = 1080;
@@ -72,10 +78,21 @@ int main()
 				color += RenderColor( ray, world );
 			}
 			color /= static_cast<float>( MAX_SAMPLES );
+			color = glm::sqrt( color );
 
 			buffer[( ( iY * WIDTH ) + x ) * 3] = std::uint8_t( 255.99f * color[0] );
 			buffer[( ( iY * WIDTH ) + x ) * 3 + 1] = std::uint8_t( 255.99f * color[1] );
 			buffer[( ( iY * WIDTH ) + x ) * 3 + 2] = std::uint8_t( 255.99f * color[2] );
+
+		#ifdef _DEBUG
+			currentProgress = static_cast<std::uint16_t>(std::floor( ( ( ( static_cast<float>( y ) *static_cast<float>( WIDTH ) ) + static_cast<float>( x ) ) / static_cast<float>( WIDTH * HEIGHT ) ) * 100.0f ));
+
+			if(currentProgress > lastProgress)
+			{
+				lastProgress = currentProgress;
+				std::cout << lastProgress << "%" << std::endl;
+			}
+		#endif
 		}
 	}
 
@@ -83,7 +100,8 @@ int main()
 	stbi_write_png( "final.png", WIDTH, HEIGHT, 3, buffer, 0 );
 
 	free( buffer );
-	delete [] list;
+	delete list[0];
+	delete list[1];
 	delete world;
 
 	return 0;
