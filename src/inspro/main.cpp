@@ -13,18 +13,26 @@
 #include <inspro/ray.hpp>
 #include <inspro/hittable_list.hpp>
 #include <inspro/sphere.hpp>
+#include <inspro/lambertian.hpp>
+#include <inspro/metal.hpp>
 
-glm::vec3 RenderColor( const insp::Ray &r, insp::Hittable *world )
+glm::vec3 RenderColor( const insp::Ray &ray, insp::Hittable *world, std::uint8_t depth )
 {
 	insp::HitRecord hitRecord;
-	if( world->Hit( r, 0.001f, std::numeric_limits<float>::max(), hitRecord ) )
+	if( world->Hit( ray, 0.001f, std::numeric_limits<float>::max(), hitRecord ) )
 	{
-		glm::vec3 target = hitRecord.position + hitRecord.normal + insp::RandomInUnitSphere();
-		return 0.5f * RenderColor( insp::Ray( hitRecord.position, target - hitRecord.position ), world );
+		insp::Ray scattered;
+		glm::vec3 attenuation(0.0f);
+
+		if( depth < 50 && hitRecord.material->Scatter( ray, hitRecord, attenuation, scattered ) )
+		{
+			return attenuation * RenderColor( scattered, world, depth + 1 );
+		}
+		return attenuation;
 	}
 	else
 	{
-		glm::vec3 unitDirection = glm::normalize( r.GetDirection() );
+		glm::vec3 unitDirection = glm::normalize( ray.GetDirection() );
 		float t = 0.5f * ( unitDirection.y + 1.0f );
 		return ( 1.0f - t ) * glm::vec3( 1.0f ) + t * glm::vec3( 0.5f, 0.7f, 1.0f );
 	}
@@ -57,10 +65,12 @@ int main()
 	glm::vec3 color;
 	std::int16_t iY = 0; // To flip the buffer
 
-	insp::Hittable *list[2];
-	list[0] = new insp::Sphere( glm::vec3( 0, 0, -1 ), 0.5 );
-	list[1] = new insp::Sphere( glm::vec3( 0, -100.5, -1 ), 100 );
-	insp::Hittable *world = new insp::HittableList( list, 2 );
+	insp::Hittable *list[4];
+	list[0] = new insp::Sphere( glm::vec3( 0, 0, -1 ), 0.5f, new insp::Lambertian(glm::vec3( 0.8f, 0.3f, 0.3f ) ) );
+	list[1] = new insp::Sphere( glm::vec3( 0, -100.5, -1 ), 100.0f, new insp::Lambertian( glm::vec3( 0.8f, 0.8f, 0.0f ) ) );
+	list[2] = new insp::Sphere( glm::vec3( 1.0f, 0.0f, -1.0f ), 0.5f, new insp::Metal( glm::vec3( 0.8f, 0.6f, 0.2f ), 0.3f ) );
+	list[3] = new insp::Sphere( glm::vec3( -1.0f, 0.0f, -1.0f ), 0.5f, new insp::Metal( glm::vec3( 0.8f ), 1.0f ) );
+	insp::Hittable *world = new insp::HittableList( list, 4 );
 
 	for( std::uint16_t y = 0; y < HEIGHT; ++y )
 	{
@@ -75,7 +85,7 @@ int main()
 				float v = ( static_cast<float>( y ) + insp::RandomFloat() ) / static_cast<float>( HEIGHT );
 
 				ray = camera.GetRay( u, v );
-				color += RenderColor( ray, world );
+				color += RenderColor( ray, world, 0 );
 			}
 			color /= static_cast<float>( MAX_SAMPLES );
 			color = glm::sqrt( color );
@@ -102,6 +112,8 @@ int main()
 	free( buffer );
 	delete list[0];
 	delete list[1];
+	delete list[2];
+	delete list[3];
 	delete world;
 
 	return 0;
