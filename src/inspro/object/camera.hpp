@@ -1,8 +1,15 @@
 #pragma once
-#include <inspro/ray.hpp>
 
+// Inspro includes
+#include <inspro/raytracing/ray.hpp>
+
+// Util includes
+#include <util/random.hpp>
+
+// Third party includes
 #include <glm/gtc/constants.hpp>
 #include <glm/geometric.hpp>
+
 
 namespace insp
 {

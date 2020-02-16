@@ -1,5 +1,8 @@
 #pragma once
-#include <inspro/hittable.hpp>
+
+// Inspro includes
+#include <inspro/raytracing/hittable.hpp>
+
 
 namespace insp
 {

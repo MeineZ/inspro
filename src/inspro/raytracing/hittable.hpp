@@ -1,7 +1,8 @@
 #pragma once
 
 // Inspro includes
-#include <inspro/ray.hpp>
+#include <inspro/raytracing/ray.hpp>
+
 
 namespace insp
 {

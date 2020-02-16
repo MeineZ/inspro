@@ -1,26 +1,41 @@
+// STD includes
 #include <iostream>
 #include <limits>
-#include <cstdint>
 
-#include <stb_image_write.h>
-#include <glm/vec3.hpp>
-#include <glm/geometric.hpp>
+// Inspro includes
+#include <inspro/object/camera.hpp>
+#include <inspro/raytracing/ray.hpp>
+#include <inspro/raytracing/hittable_list.hpp>
+#include <inspro/object/sphere.hpp>
+#include <inspro/material/lambertian.hpp>
+#include <inspro/material/metal.hpp>
+#include <inspro/material/dielectric.hpp>
 
-#include <time.h>
+// Util includes
 #include <util/random.hpp>
 
-#include <inspro/camera.hpp>
-#include <inspro/ray.hpp>
-#include <inspro/hittable_list.hpp>
-#include <inspro/sphere.hpp>
-#include <inspro/lambertian.hpp>
-#include <inspro/metal.hpp>
-#include <inspro/dielectric.hpp>
+// Third party includes
+#include <glm/vec3.hpp>
+#include <glm/geometric.hpp>
+#include <stb_image_write.h>
 
-std::uint16_t numberOfBalls = 500;
+insp::Hittable *BasicScene()
+{
+	std::uint16_t numberOfBalls = 5;
+	insp::Hittable **list = new insp::Hittable * [numberOfBalls];
+
+	list[0] = new insp::Sphere( glm::vec3( 0.0f, 0.0f, -1.0f ), 0.5f, new insp::Lambertian( glm::vec3( 0.1f, 0.2f, 0.5f ) ) );
+	list[1] = new insp::Sphere( glm::vec3( 0.0f, -100.5f, -1.0f ), 100.0f, new insp::Lambertian( glm::vec3( 0.8f, 0.8f, 0.0f ) ) );
+	list[2] = new insp::Sphere( glm::vec3( 1.0f, 0.0f, -1.0f ), 0.5f, new insp::Metal( glm::vec3( 0.8f, 0.6f, 0.2f ), 0.3f ) );
+	list[3] = new insp::Sphere( glm::vec3( -1.0f, 0.0f, -1.0f ), 0.5f, new insp::Dielectric( 1.5f ) );
+	list[4] = new insp::Sphere( glm::vec3( -1.0f, 0.0f, -1.0f ), -0.45f, new insp::Dielectric( 1.5f ) );
+
+	return new insp::HittableList( list, numberOfBalls );
+}
 
 insp::Hittable *RandomScene()
 {
+	std::uint16_t numberOfBalls = 500;
 	insp::Hittable **list = new insp::Hittable * [numberOfBalls + 1];
 	list[0] = new insp::Sphere( glm::vec3( 0.0f, -1000.0f, 0.0f ), 1000.0f, new insp::Lambertian( glm::vec3( 0.5f, 0.5f, 0.5f ) ) );
 	std::uint16_t i = 1;
@@ -62,7 +77,7 @@ insp::Hittable *RandomScene()
 	list[i++] = new insp::Sphere( glm::vec3( -4.0f, 1.0f, 0.0f ), 1.0f, new insp::Lambertian( glm::vec3( 0.4f, 0.2f, 0.1f ) ) );
 	list[i++] = new insp::Sphere( glm::vec3( 4.0f, 1.0f, 0.0f ), 1.0f, new insp::Metal( glm::vec3( 0.7f, 0.6f, 0.5f ), 0.0f ) );
 
-	return new insp::HittableList( list, 5 );
+	return new insp::HittableList( list, numberOfBalls );
 }
 
 glm::vec3 RenderColor( const insp::Ray &ray, insp::Hittable *world, std::uint8_t depth )
@@ -96,34 +111,27 @@ int main()
 
 	const std::uint16_t WIDTH = 1920;
 	const std::uint16_t HEIGHT = 1080;
+
 	std::uint8_t *buffer = static_cast<std::uint8_t *>( malloc( WIDTH * HEIGHT * 3 * sizeof( std::uint8_t ) ) );
 
 	insp::Camera camera;
 	{ // Create lookat
-		glm::vec3 origin( -2.0f, 0.0f, 2.0f );
+		glm::vec3 origin( -5.0f, 0.0f, 5.0f );
 		glm::vec3 lookAt( 0.0f, 0.0f, -1.0f );
 		glm::vec3 up( 0.0f, 1.0f, 0.0f );
 		float focusDistance = glm::length( origin - lookAt );
 		float aperature = 2.0f;
 		float aspectRatio = static_cast<float>( WIDTH ) / static_cast<float>( HEIGHT );
 
-		camera.LookAt( origin, lookAt, up, 90, aspectRatio, aperature, focusDistance );
+		camera.LookAt( origin, lookAt, up, 20, aspectRatio, aperature, focusDistance );
 	}
+
+	insp::Hittable *world = BasicScene();
+	//insp::Hittable *world = RandomScene();
 
 	insp::Ray ray;
 	glm::vec3 color;
 	std::int16_t iY = 0; // To flip the buffer
-
-	insp::Hittable *list[5];
-	list[0] = new insp::Sphere( glm::vec3( 0.0f, 0.0f, -1.0f ), 0.5f, new insp::Lambertian( glm::vec3( 0.1f, 0.2f, 0.5f ) ) );
-	list[1] = new insp::Sphere( glm::vec3( 0.0f, -100.5f, -1.0f ), 100.0f, new insp::Lambertian( glm::vec3( 0.8f, 0.8f, 0.0f ) ) );
-	list[2] = new insp::Sphere( glm::vec3( 1.0f, 0.0f, -1.0f ), 0.5f, new insp::Metal( glm::vec3( 0.8f, 0.6f, 0.2f ), 0.3f ) );
-	list[3] = new insp::Sphere( glm::vec3( -1.0f, 0.0f, -1.0f ), 0.5f, new insp::Dielectric( 1.5f ) );
-	list[4] = new insp::Sphere( glm::vec3( -1.0f, 0.0f, -1.0f ), -0.45f, new insp::Dielectric( 1.5f ) );
-
-	insp::Hittable *world = new insp::HittableList( list, 5 );
-
-	//insp::Hittable *world = RandomScene();
 
 	for( std::uint16_t y = 0; y < HEIGHT; ++y )
 	{
@@ -157,8 +165,7 @@ int main()
 		}
 	}
 
-
-	stbi_write_png( "final.png", WIDTH, HEIGHT, 3, buffer, 0 );
+	stbi_write_png( "output/final.png", WIDTH, HEIGHT, 3, buffer, 0 );
 
 	free( buffer );
 	delete world;

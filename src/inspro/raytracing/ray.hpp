@@ -1,5 +1,8 @@
 #pragma once
+
+// Third party includes
 #include <glm/vec3.hpp>
+
 
 namespace insp
 {

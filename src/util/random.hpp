@@ -5,6 +5,7 @@
 
 // Third party includes
 #include <glm/vec3.hpp>
+#include <glm/geometric.hpp>
 
 /*!
 	\namespace Inspro namespace.

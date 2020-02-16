@@ -1,12 +1,15 @@
 #pragma once
 // Inspro includes
-#include <inspro/ray.hpp>
-#include <inspro/material.hpp>
+#include <inspro/raytracing/ray.hpp>
+#include <inspro/material/material.hpp>
+
+// Util includes
 #include <util/defines.hpp>
 #include <util/random.hpp>
 
 // Third party includes
 #include <glm/vec3.hpp>
+
 
 namespace insp
 {

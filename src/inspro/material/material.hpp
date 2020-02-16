@@ -1,11 +1,12 @@
 #pragma once
 
 // Inspro includes
-#include <inspro/ray.hpp>
-#include <inspro/hittable.hpp>
+#include <inspro/raytracing/ray.hpp>
+#include <inspro/raytracing/hittable.hpp>
 
 // Third party includes
 #include <glm/vec3.hpp>
+
 
 namespace insp
 {
