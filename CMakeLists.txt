@@ -96,15 +96,19 @@ file(GLOB UTIL_HEADERS "${UTIL_SOURCE_DIR}/*.hpp")
 file(GLOB UTIL_SOURCES "${UTIL_SOURCE_DIR}/*.cpp")
 file(GLOB_RECURSE UTIL_STB_HEADERS "${UTIL_SOURCE_DIR}/stb/*.hpp")
 file(GLOB_RECURSE UTIL_STB_SOURCES "${UTIL_SOURCE_DIR}/stb/*.cpp")
+file(GLOB_RECURSE UTIL_MATH_HEADERS "${UTIL_SOURCE_DIR}/math/*.hpp")
+file(GLOB_RECURSE UTIL_MATH_SOURCES "${UTIL_SOURCE_DIR}/math/*.cpp")
 
 # === Util source groups === #
 source_group("Main" FILES ${UTIL_HEADERS} ${UTIL_SOURCES})
 source_group("stb" FILES ${UTIL_STB_HEADERS} ${UTIL_STB_SOURCES})
+source_group("math" FILES ${UTIL_MATH_HEADERS} ${UTIL_MATH_SOURCES})
 
 # === Create Util library === #
 add_library(${UTIL_NAME} STATIC 
 	${UTIL_HEADERS} ${UTIL_SOURCES}
-	${UTIL_STB_HEADERS} ${UTIL_STB_SOURCES})
+	${UTIL_STB_HEADERS} ${UTIL_STB_SOURCES}
+	${UTIL_MATH_HEADERS} ${UTIL_MATH_SOURCES})
 
 # === Util include directories === #
 target_include_directories(${UTIL_NAME} PUBLIC ${UTIL_SOURCE_DIR})

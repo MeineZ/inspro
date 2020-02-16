@@ -16,6 +16,14 @@ namespace insp
             listSize(n)
         { }
 
+        ~HittableList()
+        {
+            for( std::uint16_t i = 0; i < listSize; ++i )
+            {
+                delete list[i];
+            }
+        }
+
         virtual bool Hit(
             const Ray &r, float tMin, float tMax, HitRecord &rec ) const;
 

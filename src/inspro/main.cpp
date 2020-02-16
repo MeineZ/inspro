@@ -15,6 +15,55 @@
 #include <inspro/sphere.hpp>
 #include <inspro/lambertian.hpp>
 #include <inspro/metal.hpp>
+#include <inspro/dielectric.hpp>
+
+std::uint16_t numberOfBalls = 500;
+
+insp::Hittable *RandomScene()
+{
+	insp::Hittable **list = new insp::Hittable * [numberOfBalls + 1];
+	list[0] = new insp::Sphere( glm::vec3( 0.0f, -1000.0f, 0.0f ), 1000.0f, new insp::Lambertian( glm::vec3( 0.5f, 0.5f, 0.5f ) ) );
+	std::uint16_t i = 1;
+	for( std::int16_t a = -11; a < 11; ++a )
+	{
+		for( std::int16_t b = -11; b < 11; ++b )
+		{
+			float choose_mat = insp::RandomFloat();
+			glm::vec3 center( a + 0.9f * insp::RandomFloat(), 0.2f, b + 0.9f * insp::RandomFloat() );
+			if( ( glm::length( center - glm::vec3( 4.0f, 0.2f, 0.0f ) ) ) > 0.9f )
+			{
+				if( choose_mat < 0.8f )
+				{  // diffuse
+					list[i++] = new insp::Sphere( center, 0.2f,
+													new insp::Lambertian( glm::vec3( insp::RandomFloat() * insp::RandomFloat(),
+													insp::RandomFloat() * insp::RandomFloat(),
+													insp::RandomFloat() * insp::RandomFloat() )
+					)
+					);
+				}
+				else if( choose_mat < 0.95f )
+				{ // metal
+					list[i++] = new insp::Sphere( center, 0.2f,
+													new insp::Metal( glm::vec3( 0.5f * ( 1.0f + insp::RandomFloat() ),
+													0.5f * ( 1.0f + insp::RandomFloat() ),
+													0.5f * ( 1.0f + insp::RandomFloat() ) ),
+													0.5f * insp::RandomFloat() ) );
+				}
+				else
+				{  // glass
+					list[i++] = new insp::Sphere( center, 0.2f, new insp::Dielectric( 1.5f ) );
+				}
+			}
+		}
+	}
+
+
+	list[i++] = new insp::Sphere( glm::vec3( 0.0f, 1.0f, 0.0f ), 1.0f, new insp::Dielectric( 1.5f ) );
+	list[i++] = new insp::Sphere( glm::vec3( -4.0f, 1.0f, 0.0f ), 1.0f, new insp::Lambertian( glm::vec3( 0.4f, 0.2f, 0.1f ) ) );
+	list[i++] = new insp::Sphere( glm::vec3( 4.0f, 1.0f, 0.0f ), 1.0f, new insp::Metal( glm::vec3( 0.7f, 0.6f, 0.5f ), 0.0f ) );
+
+	return new insp::HittableList( list, 5 );
+}
 
 glm::vec3 RenderColor( const insp::Ray &ray, insp::Hittable *world, std::uint8_t depth )
 {
@@ -22,7 +71,7 @@ glm::vec3 RenderColor( const insp::Ray &ray, insp::Hittable *world, std::uint8_t
 	if( world->Hit( ray, 0.001f, std::numeric_limits<float>::max(), hitRecord ) )
 	{
 		insp::Ray scattered;
-		glm::vec3 attenuation(0.0f);
+		glm::vec3 attenuation( 0.0f );
 
 		if( depth < 50 && hitRecord.material->Scatter( ray, hitRecord, attenuation, scattered ) )
 		{
@@ -40,12 +89,10 @@ glm::vec3 RenderColor( const insp::Ray &ray, insp::Hittable *world, std::uint8_t
 
 int main()
 {
-#ifdef _DEBUG
 	std::uint16_t lastProgress = 0;
 	std::uint16_t currentProgress = 0;
-#endif // _DEBUG
 
-	const std::uint8_t MAX_SAMPLES = 2;
+	const std::uint8_t MAX_SAMPLES = 50;
 
 	const std::uint16_t WIDTH = 1920;
 	const std::uint16_t HEIGHT = 1080;
@@ -53,24 +100,30 @@ int main()
 
 	insp::Camera camera;
 	{ // Create lookat
-		glm::vec3 origin( 0.0f, 0.0f, 0.0f );
+		glm::vec3 origin( -2.0f, 0.0f, 2.0f );
 		glm::vec3 lookAt( 0.0f, 0.0f, -1.0f );
 		glm::vec3 up( 0.0f, 1.0f, 0.0f );
+		float focusDistance = glm::length( origin - lookAt );
+		float aperature = 2.0f;
 		float aspectRatio = static_cast<float>( WIDTH ) / static_cast<float>( HEIGHT );
 
-		camera.LookAt( origin, lookAt, up, 90, aspectRatio );
+		camera.LookAt( origin, lookAt, up, 90, aspectRatio, aperature, focusDistance );
 	}
 
 	insp::Ray ray;
 	glm::vec3 color;
 	std::int16_t iY = 0; // To flip the buffer
 
-	insp::Hittable *list[4];
-	list[0] = new insp::Sphere( glm::vec3( 0, 0, -1 ), 0.5f, new insp::Lambertian(glm::vec3( 0.8f, 0.3f, 0.3f ) ) );
-	list[1] = new insp::Sphere( glm::vec3( 0, -100.5, -1 ), 100.0f, new insp::Lambertian( glm::vec3( 0.8f, 0.8f, 0.0f ) ) );
+	insp::Hittable *list[5];
+	list[0] = new insp::Sphere( glm::vec3( 0.0f, 0.0f, -1.0f ), 0.5f, new insp::Lambertian( glm::vec3( 0.1f, 0.2f, 0.5f ) ) );
+	list[1] = new insp::Sphere( glm::vec3( 0.0f, -100.5f, -1.0f ), 100.0f, new insp::Lambertian( glm::vec3( 0.8f, 0.8f, 0.0f ) ) );
 	list[2] = new insp::Sphere( glm::vec3( 1.0f, 0.0f, -1.0f ), 0.5f, new insp::Metal( glm::vec3( 0.8f, 0.6f, 0.2f ), 0.3f ) );
-	list[3] = new insp::Sphere( glm::vec3( -1.0f, 0.0f, -1.0f ), 0.5f, new insp::Metal( glm::vec3( 0.8f ), 1.0f ) );
-	insp::Hittable *world = new insp::HittableList( list, 4 );
+	list[3] = new insp::Sphere( glm::vec3( -1.0f, 0.0f, -1.0f ), 0.5f, new insp::Dielectric( 1.5f ) );
+	list[4] = new insp::Sphere( glm::vec3( -1.0f, 0.0f, -1.0f ), -0.45f, new insp::Dielectric( 1.5f ) );
+
+	insp::Hittable *world = new insp::HittableList( list, 5 );
+
+	//insp::Hittable *world = RandomScene();
 
 	for( std::uint16_t y = 0; y < HEIGHT; ++y )
 	{
@@ -94,15 +147,13 @@ int main()
 			buffer[( ( iY * WIDTH ) + x ) * 3 + 1] = std::uint8_t( 255.99f * color[1] );
 			buffer[( ( iY * WIDTH ) + x ) * 3 + 2] = std::uint8_t( 255.99f * color[2] );
 
-		#ifdef _DEBUG
-			currentProgress = static_cast<std::uint16_t>(std::floor( ( ( ( static_cast<float>( y ) *static_cast<float>( WIDTH ) ) + static_cast<float>( x ) ) / static_cast<float>( WIDTH * HEIGHT ) ) * 100.0f ));
+			currentProgress = static_cast<std::uint16_t>( std::floor( ( ( ( static_cast<float>( y ) *static_cast<float>( WIDTH ) ) + static_cast<float>( x ) ) / static_cast<float>( WIDTH * HEIGHT ) ) * 100.0f ) );
 
-			if(currentProgress > lastProgress)
+			if( currentProgress > lastProgress )
 			{
 				lastProgress = currentProgress;
 				std::cout << lastProgress << "%" << std::endl;
 			}
-		#endif
 		}
 	}
 
@@ -110,10 +161,6 @@ int main()
 	stbi_write_png( "final.png", WIDTH, HEIGHT, 3, buffer, 0 );
 
 	free( buffer );
-	delete list[0];
-	delete list[1];
-	delete list[2];
-	delete list[3];
 	delete world;
 
 	return 0;

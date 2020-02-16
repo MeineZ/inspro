@@ -9,7 +9,7 @@ namespace insp
 
     struct HitRecord
     {
-        insp::Material *material;
+        insp::Material *material = nullptr;
         glm::vec3 position{ 0.0f, 0.0f, 0.0f };
         glm::vec3 normal{ 0.0f, 0.0f, 0.0f };
         float t = 0.0f;
