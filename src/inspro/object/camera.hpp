@@ -50,12 +50,14 @@ namespace insp
 			this->vertical = 2.0f * this->vertical.y * focusDistance * v;
 		}
 
-		inline insp::Ray GetRay( float s, float t )
+		inline insp::Ray GetRay( float s, float t ) const
 		{
-			glm::vec3 radius = lensRadius * insp::RandomInUnitDisc();
+			/*glm::vec3 radius = lensRadius * insp::RandomInUnitDisc();
 			glm::vec3 offset = this->u * radius.x + this->v * radius.y;
 			return Ray( this->origin + offset,
-						this->lowerLeftCorner + s * this->horizontal + t * this->vertical - this->origin - offset );
+						this->lowerLeftCorner + s * this->horizontal + t * this->vertical - this->origin - offset );*/
+			return Ray( this->origin,
+						this->lowerLeftCorner + s * this->horizontal + t * this->vertical - this->origin );
 		}
 
 		glm::vec3 origin;
