@@ -27,7 +27,7 @@
 const std::uint16_t OUTPUT_WIDTH = 1920;
 const std::uint16_t OUTPUT_HEIGHT = 1080;
 
-const std::uint8_t MAX_SAMPLES = 128;
+const std::uint8_t MAX_SAMPLES = 8;
 const std::int32_t THREAD_BUFFER_SIZE = 128;
 const std::int32_t MAX_INDEX = static_cast<std::int32_t>( std::ceil( static_cast<double>( OUTPUT_WIDTH ) / static_cast<double>( THREAD_BUFFER_SIZE ) ) *std::ceil( static_cast<double>( OUTPUT_HEIGHT ) / static_cast<double>( THREAD_BUFFER_SIZE ) ) );
 
@@ -37,7 +37,7 @@ namespace glob
 }
 
 
-insp::Hittable *BasicScene()
+insp::HittableList *BasicScene()
 {
 	std::uint16_t numberOfBalls = 5;
 	insp::Hittable **list = new insp::Hittable * [numberOfBalls];
@@ -51,7 +51,7 @@ insp::Hittable *BasicScene()
 	return new insp::HittableList( list, numberOfBalls );
 }
 
-insp::Hittable *RandomScene()
+insp::HittableList *RandomScene()
 {
 	std::uint16_t numberOfBalls = 501;
 	insp::Hittable **list = new insp::Hittable * [numberOfBalls];
@@ -196,8 +196,8 @@ int main()
 
 	insp::Camera camera;
 	{ // Create lookat
-		glm::vec3 origin( 0.0f, 0.0f, 5.0f );
-		glm::vec3 lookAt( 0.0f, 0.0f, -1.0f );
+		glm::vec3 origin( 13.0f, 2.0f, 3.0f );
+		glm::vec3 lookAt( 0.0f, 0.0f, 0.0f );
 		glm::vec3 up( 0.0f, 1.0f, 0.0f );
 		float focusDistance = glm::length( origin - lookAt );
 		float aperature = 2.0f;
@@ -207,8 +207,8 @@ int main()
 	}
 
 	// Create the scene
-	//insp::HittableList *world = static_cast<insp::HittableList*>(RandomScene());
-	insp::HittableList *world = static_cast<insp::HittableList*>(BasicScene());
+	insp::HittableList *world = RandomScene();
+	//insp::HittableList *world = BasicScene();
 
 	// Create the BVH
 	insp::BVHNode *bvh = new insp::BVHNode( world->GetList(), world->GetSize(), 0.0f, 0.0f);
@@ -219,9 +219,11 @@ int main()
 	const std::uint32_t numberOfThreads = std::thread::hardware_concurrency();
 	std::thread **threadPool = static_cast<std::thread**>(malloc( numberOfThreads * sizeof(std::thread*)));
 
+	auto startTime = std::chrono::system_clock::now();
+
 	for( std::uint32_t i = 0; i < numberOfThreads; ++i )
 	{
-		threadPool[i] = new std::thread( &TraceRays, buffer, &camera, bvh );
+		threadPool[i] = new std::thread( &TraceRays, buffer, &camera, world );
 	}
 
 	for( std::uint32_t i = 0; i < numberOfThreads; ++i )
@@ -229,6 +231,12 @@ int main()
 		threadPool[i]->join();
 		delete threadPool[i];
 	}
+
+	auto endTime = std::chrono::system_clock::now();
+
+	auto ms = std::chrono::duration_cast<std::chrono::milliseconds>( endTime - startTime ).count();
+
+	std::cout << "Time to render: " << ms << " ms with " << int( MAX_SAMPLES ) << " samples!" << std::endl;
 
 	stbi_write_png( "output/final.png", OUTPUT_WIDTH, OUTPUT_HEIGHT, 3, buffer, 0 );
 
