@@ -2,6 +2,7 @@
 
 // Inspro includes
 #include <inspro/raytracing/ray.hpp>
+#include <inspro/raytracing/aabb.hpp>
 
 
 namespace insp
@@ -19,8 +20,8 @@ namespace insp
     class Hittable
     {
     public:
-        virtual bool Hit(
-            const Ray &r, float tMin, float tMax, HitRecord &rec ) const = 0;
+        virtual bool Hit(const Ray &r, float tMin, float tMax, HitRecord &rec ) const = 0;
+        virtual bool BoundingBox( const float t0, const float t1, AABB &box ) const = 0;
     };
 
 } // insp namespace

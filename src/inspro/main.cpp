@@ -4,11 +4,13 @@
 #include <atomic>
 #include <thread>
 #include <algorithm>
+#include <chrono>
 
 // Inspro includes
 #include <inspro/object/camera.hpp>
 #include <inspro/raytracing/ray.hpp>
 #include <inspro/raytracing/hittable_list.hpp>
+#include <inspro/raytracing/bvh_node.hpp>
 #include <inspro/object/sphere.hpp>
 #include <inspro/material/lambertian.hpp>
 #include <inspro/material/metal.hpp>
@@ -194,7 +196,7 @@ int main()
 
 	insp::Camera camera;
 	{ // Create lookat
-		glm::vec3 origin( -7.5f, 3.0f, 7.5f );
+		glm::vec3 origin( 0.0f, 0.0f, 5.0f );
 		glm::vec3 lookAt( 0.0f, 0.0f, -1.0f );
 		glm::vec3 up( 0.0f, 1.0f, 0.0f );
 		float focusDistance = glm::length( origin - lookAt );
@@ -204,9 +206,14 @@ int main()
 		camera.LookAt( origin, lookAt, up, 20, aspectRatio, aperature, focusDistance );
 	}
 
-	insp::Hittable *world = BasicScene();
-	//insp::Hittable *world = RandomScene();
+	// Create the scene
+	//insp::HittableList *world = static_cast<insp::HittableList*>(RandomScene());
+	insp::HittableList *world = static_cast<insp::HittableList*>(BasicScene());
 
+	// Create the BVH
+	insp::BVHNode *bvh = new insp::BVHNode( world->GetList(), world->GetSize(), 0.0f, 0.0f);
+
+	// Create threads and run the raytracer
 	glob::index = 0;
 
 	const std::uint32_t numberOfThreads = std::thread::hardware_concurrency();
@@ -214,7 +221,7 @@ int main()
 
 	for( std::uint32_t i = 0; i < numberOfThreads; ++i )
 	{
-		threadPool[i] = new std::thread( &TraceRays, buffer, &camera, world );
+		threadPool[i] = new std::thread( &TraceRays, buffer, &camera, bvh );
 	}
 
 	for( std::uint32_t i = 0; i < numberOfThreads; ++i )
@@ -223,11 +230,11 @@ int main()
 		delete threadPool[i];
 	}
 
-
 	stbi_write_png( "output/final.png", OUTPUT_WIDTH, OUTPUT_HEIGHT, 3, buffer, 0 );
 
 	free( buffer );
 	free(threadPool);
+	delete bvh;
 	delete world;
 
 	return 0;

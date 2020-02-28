@@ -3,7 +3,10 @@
 // Inspro includes
 #include <inspro/raytracing/hittable.hpp>
 #include <inspro/material/material.hpp>
+#include <inspro/raytracing/aabb.hpp>
 
+// Util includes
+#include <util/defines.hpp>
 
 namespace insp
 {
@@ -28,6 +31,7 @@ namespace insp
 		}
 
 		virtual bool Hit( const Ray &r, float tMin, float tMax, HitRecord &rec ) const;
+		virtual bool BoundingBox( const float t0, const float t1, AABB &box ) const;
 
 		glm::vec3 center;
 		float radius;
@@ -63,6 +67,15 @@ namespace insp
 			}
 		}
 		return false;
+	}
+
+	bool Sphere::BoundingBox( const float t0, const float t1, AABB &box ) const
+	{
+		UNUSED( t0 );
+		UNUSED( t1 );
+		box = AABB( center - glm::vec3( this->radius < 0.0f ? -this->radius : this->radius ),
+					center + glm::vec3( this->radius < 0.0f ? -this->radius : this->radius ) );
+		return true;
 	}
 
 } // insp namespace
